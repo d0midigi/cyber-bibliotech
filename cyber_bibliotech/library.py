@@ -93,12 +93,23 @@ class Library:
         return self.books.copy()
     
     def save(self):
-        """Save library data to JSON file."""
+        """Save library data to JSON file using atomic write."""
         data = {
             "books": [book.to_dict() for book in self.books]
         }
-        with open(self.storage_file, 'w') as f:
-            json.dump(data, f, indent=2)
+        # Use atomic write: write to temp file, then rename
+        storage_path = Path(self.storage_file)
+        temp_file = storage_path.with_suffix('.tmp')
+        try:
+            with open(temp_file, 'w') as f:
+                json.dump(data, f, indent=2)
+            # Atomic rename on POSIX systems
+            temp_file.replace(storage_path)
+        except Exception:
+            # Clean up temp file if something went wrong
+            if temp_file.exists():
+                temp_file.unlink()
+            raise
     
     def load(self):
         """Load library data from JSON file."""
@@ -109,8 +120,8 @@ class Library:
             with open(self.storage_file, 'r') as f:
                 data = json.load(f)
                 self.books = [Book.from_dict(book_data) for book_data in data.get("books", [])]
-        except (json.JSONDecodeError, KeyError):
-            # If file is corrupted, start fresh
+        except (json.JSONDecodeError, TypeError, ValueError):
+            # If file is corrupted or has invalid data, start fresh
             self.books = []
     
     def __len__(self):

@@ -16,12 +16,23 @@ class Book:
     description: Optional[str] = None
     
     def to_dict(self):
-        """Convert book to dictionary."""
+        """Convert book to dictionary.
+        
+        Returns:
+            dict: Dictionary representation of the book with all fields
+        """
         return asdict(self)
     
     @classmethod
     def from_dict(cls, data):
-        """Create book from dictionary."""
+        """Create book from dictionary.
+        
+        Args:
+            data: Dictionary containing book data with keys matching Book fields
+            
+        Returns:
+            Book: A new Book instance created from the dictionary data
+        """
         return cls(**data)
     
     def __str__(self):

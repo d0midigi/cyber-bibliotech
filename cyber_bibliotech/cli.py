@@ -53,7 +53,16 @@ Usage:
             return
         
         year_input = input("Year (optional): ").strip()
-        year = int(year_input) if year_input.isdigit() else None
+        year = None
+        if year_input:
+            if year_input.isdigit():
+                year_value = int(year_input)
+                if 1000 <= year_value <= 2100:
+                    year = year_value
+                else:
+                    print("Warning: Year should be between 1000 and 2100. Skipping year.")
+            else:
+                print("Warning: Invalid year format. Skipping year.")
         
         genre = input("Genre (optional): ").strip() or None
         description = input("Description (optional): ").strip() or None
@@ -154,10 +163,10 @@ Usage:
                 elif command == 'list':
                     self.list_books()
                 elif command.startswith('search'):
-                    query = command[6:].strip() if len(command) > 6 else ""
+                    query = command[7:].strip() if len(command) > 7 else ""
                     self.search_books(query)
                 elif command.startswith('remove'):
-                    isbn = command[6:].strip() if len(command) > 6 else ""
+                    isbn = command[7:].strip() if len(command) > 7 else ""
                     self.remove_book(isbn)
                 else:
                     print(f"Unknown command: {command}")
